@@ -1,7 +1,7 @@
 [project]
 name = "barcode-transformer"
 version = "0.1.0"
-description = "Add your description here"
+description = "Small Python application to transform datamatrix codes into code 128 codes so they can be printed as a list on single sheet of paperand scanned using 1D scanner."
 requires-python = ">=3.13"
 dependencies = [
     "flask>=3.1.3",
