@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Results &mdash; Barcode Transformer</title>
+  <style>
+    /* ── Screen styles ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f0f2f5;
+      padding: 2rem;
+    }
+
+    /* Header bar */
+    .header {
+      max-width: 980px;
+      margin: 0 auto 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .header-left h1 { font-size: 1.4rem; color: #111; }
+    .header-left .sub { font-size: 0.85rem; color: #888; margin-top: 0.2rem; }
+
+    .actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+
+    .btn {
+      padding: 0.55rem 1.1rem;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .btn:hover  { opacity: 0.88; }
+    .btn:active { transform: scale(0.97); }
+
+    .btn-back  { background: #fff; color: #444; border: 1px solid #d1d5db; }
+    .btn-pdf   { background: #16a34a; color: #fff; }
+    .btn-print { background: #3b82f6; color: #fff; }
+
+    /* Barcode grid */
+    .grid {
+      max-width: 980px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+      padding: 1rem 0.8rem 0.8rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .card-index {
+      font-size: 0.68rem;
+      color: #bbb;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      align-self: flex-end;
+    }
+
+    .card img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .card-serial {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.75rem;
+      color: #555;
+      word-break: break-all;
+      text-align: center;
+    }
+
+    /* ── Print styles ──────────────────────────────────────────────── */
+    @media print {
+      body { background: #fff; padding: 0.5cm; }
+
+      .header .actions { display: none; }
+
+      .header {
+        margin-bottom: 0.4cm;
+        border-bottom: 0.5pt solid #ccc;
+        padding-bottom: 0.3cm;
+      }
+      .header-left h1 { font-size: 12pt; }
+      .header-left .sub { font-size: 8pt; }
+
+      .grid {
+        max-width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.4cm;
+      }
+
+      .card {
+        box-shadow: none;
+        border: 0.4pt solid #ccc;
+        border-radius: 3pt;
+        padding: 0.25cm;
+        break-inside: avoid;
+      }
+
+      .card img   { max-width: 100%; }
+      .card-serial { font-size: 6.5pt; }
+      .card-index  { font-size: 6pt; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>&#9641; Transformed Barcodes</h1>
+    <p class="sub">
+      {{ count }} serial number{{ 's' if count != 1 else '' }} decoded &mdash; re-encoded as Code&nbsp;128
+    </p>
+  </div>
+  <div class="actions">
+    <a href="/" class="btn btn-back">&#8592; Upload Another</a>
+    <a href="/download-pdf" class="btn btn-pdf">&#8681; Download PDF</a>
+    <button class="btn btn-print" onclick="window.print()">&#128438; Print</button>
+  </div>
+</div>
+
+<div class="grid">
+  {% for item in items %}
+  <div class="card">
+    <span class="card-index">#{{ loop.index }}</span>
+    <img src="{{ item.image }}" alt="Code 128 barcode for {{ item.serial }}" loading="lazy">
+    <span class="card-serial">{{ item.serial }}</span>
+  </div>
+  {% endfor %}
+</div>
+
+<script>
+  setInterval(() => fetch("/heartbeat", { method: "POST" }).catch(() => {}), 10_000);
+</script>
+</body>
+</html>
