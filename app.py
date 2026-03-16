@@ -282,6 +282,24 @@ def download_pdf():
     return send_file(pdf, mimetype="application/pdf", as_attachment=True, download_name="barcodes.pdf")
 
 
+@app.post("/scan-text")
+def scan_text():
+    raw = request.form.get("raw_text", "").strip()
+    if not raw:
+        return render_template("index.html", error="No text received from scanner.")
+
+    serials = parse_serials([raw])
+    if not serials:
+        return render_template(
+            "index.html",
+            error=f"Could not parse any serial numbers from: {raw[:120]}",
+        )
+
+    session["serials"] = serials
+    items = [{"serial": s, "image": serial_to_b64(s)} for s in serials]
+    return render_template("result.html", items=items, count=len(serials))
+
+
 @app.post("/heartbeat")
 def heartbeat():
     """Called by the browser every few seconds; resets the idle shutdown timer."""
