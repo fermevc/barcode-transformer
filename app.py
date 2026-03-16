@@ -333,7 +333,7 @@ def _idle_watchdog(timeout: int = 10):
 if __name__ == "__main__":
     import webbrowser
 
-    port = 5001
+    port = 5555
     frozen = getattr(sys, "frozen", False)
 
     if frozen:
